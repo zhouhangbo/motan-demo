@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:motan="http://api.weibo.com/schema/motan"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://api.weibo.com/schema/motan http://api.weibo.com/schema/motan.xsd">
+
+    <!-- 注册中心配置 使用不同注册中心需要依赖对应的jar包。如果不使用注册中心，可以把check属性改为false，忽略注册失败。-->
+    <motan:registry regProtocol="${motan.server.registry.protocol}" name="registry" address="${motan.server.registry.address}:${motan.server.registry.port}"/>
+
+    <!-- 协议配置。为防止多个业务配置冲突，推荐使用id表示具体协议。-->
+    <motan:protocol id="serviceProtocol" default="true" name="motan" maxServerConnection="${motan.server.protocol.maxServerConnection}"
+    	minWorkerThread="${motan.server.protocol.minWorkerThread}" maxWorkerThread="${motan.server.protocol.maxWorkerThread}" 
+    	requestTimeout="${motan.server.protocol.requestTimeout}"/>
+
+    <!-- 通用配置，多个rpc服务使用相同的基础配置. group和module定义具体的服务池。export格式为“protocol id:提供服务的端口”-->
+    <motan:basicService id="serviceBasicConfig" registry="registry"
+     					group="${motan.server.basic.group}" 
+     					application="${motan.server.basic.application}" module="${motan.server.basic.module}" 
+     					shareChannel="true" export="serviceProtocol:${motan.server.basic.port}" accessLog="false"/>
+	<motan:annotation package="cn.jyc.fastpay.provider"/>
+	<bean class="cn.jyc.fastpay.common.MotanHeartbeat" destroy-method="breakdown" />
+</beans> 

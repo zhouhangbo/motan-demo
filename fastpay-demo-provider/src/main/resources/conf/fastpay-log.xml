@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="error" monitorInterval="3600"
+	packages="cn.evun.sweet.core.log"><!-- 指定扩展插件的包 -->
+	<Properties>
+		<Property name="patternLayout">%d{DEFAULT} [%-5level]
+			%class{36}-%method:%line -%n %msg%n%xEx</Property>
+	</Properties>
+	<appenders>
+		<!-- 控制台的日志输出，开发环境使用 -->
+		<Console name="console" target="SYSTEM_OUT"><!-- 默认为SYSTEM_ERR -->
+			<Filters>
+				<ThresholdFilter level="DEBUG" onMatch="ACCEPT"
+					onMismatch="DENY" /><!-- 控制在debug以上级别 -->
+				<MarkerFilter marker="rewrite" onMatch="DENY"
+					onMismatch="ACCEPT" /><!-- 不处理rewrite标记的日志 -->
+			</Filters>
+			<PatternLayout pattern="${patternLayout}" /><!--%x{req_ip} -->
+		</Console>
+		<!-- 请求时间超过3S的所有请求日志 -->
+		<RollingFile name="monitorRollingFile" fileName="/var/log/tomcat/monitor.log"
+			filePattern="/var/log/tomcat/$${date:yyyy-MM}/monitor-%d{MM-dd-yyyy}-%i.log.gz">
+			<Filters>
+				<ThresholdFilter level="INFO" onMatch="NEUTRAL"
+					onMismatch="DENY" /><!-- 控制在INFO以上级别 -->
+				<MarkerFilter marker="monitor" onMatch="ACCEPT"
+					onMismatch="DENY" /><!-- 只处理monitor标记的日志 -->
+			</Filters>
+			<PatternLayout pattern="${patternLayout}" />
+			<SizeBasedTriggeringPolicy size="50MB" />
+			<!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件，这里设置了20 -->
+			<DefaultRolloverStrategy max="20" />
+		</RollingFile>
+		<!-- 第三方中信接口日志 -->
+		<RollingFile name="zxInterfaceRollingFile" fileName="/var/log/tomcat/zxinterface.log"
+			filePattern="/var/log/tomcat/$${date:yyyy-MM}/zxinterface-%d{MM-dd-yyyy}-%i.log.gz">
+			<Filters>
+				<ThresholdFilter level="INFO" onMatch="NEUTRAL"
+					onMismatch="DENY" /><!-- 控制在INFO以上级别 -->
+				<MarkerFilter marker="zxinterface" onMatch="ACCEPT"
+					onMismatch="DENY" /><!-- 只处理zxinterface标记的日志 -->
+			</Filters>
+			<PatternLayout pattern="${patternLayout}" />
+			<Policies>
+				<TimeBasedTriggeringPolicy modulate="true"
+					interval="1" />
+			</Policies>
+			<!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件，这里设置了20 -->
+			<DefaultRolloverStrategy max="20" />
+		</RollingFile>
+		<!-- MQ消费日志 -->
+		<RollingFile name="mqRollingFile" fileName="/var/log/tomcat/mq.log"
+			filePattern="/var/log/tomcat/$${date:yyyy-MM}/mq-%d{MM-dd-yyyy}-%i.log.gz">
+			<Filters>
+				<ThresholdFilter level="INFO" onMatch="NEUTRAL"
+					onMismatch="DENY" /><!-- 控制在INFO以上级别 -->
+				<MarkerFilter marker="mq" onMatch="ACCEPT" onMismatch="DENY" /><!-- 
+					只处理zxinterface标记的日志 -->
+			</Filters>
+			<PatternLayout pattern="${patternLayout}" />
+			<Policies>
+				<TimeBasedTriggeringPolicy modulate="true"
+					interval="1" />
+			</Policies>
+			<!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件，这里设置了20 -->
+			<DefaultRolloverStrategy max="20" />
+		</RollingFile>
+		<!-- open日志 -->
+		<RollingFile name="openRollingFile" fileName="/var/log/tomcat/open.log"
+			filePattern="/var/log/tomcat/$${date:yyyy-MM}/open-%d{MM-dd-yyyy}-%i.log.gz">
+			<Filters>
+				<ThresholdFilter level="INFO" onMatch="NEUTRAL"
+					onMismatch="DENY" /><!-- 控制在INFO以上级别 -->
+				<MarkerFilter marker="open" onMatch="ACCEPT"
+					onMismatch="DENY" /><!-- 只处理zxinterface标记的日志 -->
+			</Filters>
+			<PatternLayout pattern="${patternLayout}" />
+			<Policies>
+				<TimeBasedTriggeringPolicy modulate="true"
+					interval="1" />
+			</Policies>
+			<!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件，这里设置了20 -->
+			<DefaultRolloverStrategy max="20" />
+		</RollingFile>
+		<!-- 文件形式的日志输出（每次启动时覆盖写入文件），开发或测试使用 -->
+		<!-- 使用web lookup可以指定文件存放到应用部署的根路径下。注意$表示初始化时一次性取值，$$表示动态决定值 -->
+		<File name="logfile" fileName="/var/log/tomcat/xes-log.html"
+			append="false">
+			<Filters>
+				<ThresholdFilter level="ERROR" onMatch="ACCEPT"
+					onMismatch="DENY" />
+			</Filters>
+			<HTMLLayout title="xes-log" charset="UTF-8" />
+		</File>
+		<!-- 这个会打印出所有的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档 -->
+		<RollingFile name="rollingFile" fileName="/var/log/tomcat/history.log"
+			filePattern="/var/log/tomcat/$${date:yyyy-MM}/history-%d{MM-dd-yyyy}-%i.log.gz">
+			<PatternLayout pattern="${patternLayout}" />
+			<Policies>
+				<TimeBasedTriggeringPolicy modulate="true"
+					interval="1" />
+			</Policies>
+			<!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件，这里设置了20 -->
+			<DefaultRolloverStrategy max="20" />
+		</RollingFile>
+		<RollingFile name="RocketmqClientAppender" fileName="/var/log/tomcat/ons.log"
+			filePattern="/var/log/tomcat/ons.%i.log">
+			<PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss,SSS}%m%n" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="64 MB" />
+			</Policies>
+			<!--<DefaultRolloverStrategy max="10"/> -->
+		</RollingFile>
+		<NoSql name="mongoAppender" bufferSize="50">
+			<MongoDb databaseName="${ci.mongo.database}" collectionName="fastpayMongoDBLogDo" server="${ci.log4j2.mongo.host}" port="${ci.log4j2.mongo.port}"
+					 username="${ci.mongo.username}" password="${ci.mongo.password}"/>
+            <Filters>
+                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY" /><!-- 控制在INFO以上级别 -->
+            </Filters>
+		</NoSql>
+	</appenders>
+	<loggers>
+		<root level="TRACE">
+			<AppenderRef ref="console" />
+            <AppenderRef ref="mongoAppender"/>
+			<AppenderRef ref="logfile" />
+			<AppenderRef ref="rollingFile" />
+			<AppenderRef ref="monitorRollingFile" />
+			<AppenderRef ref="zxInterfaceRollingFile" />
+		</root>
+		<Logger name="mongologger" level="debug" additivity="false">
+			<appender-ref ref="mongoAppender"/>
+		</Logger>
+		 <logger name="RocketmqClient" level="warn" additivity="false">
+            <AppenderRef ref="RocketmqClientAppender"/>
+        </logger>
+		<logger name="RocketmqCommon" level="warn" additivity="false">
+			<AppenderRef ref="RocketmqClientAppender" />
+		</logger>
+		<logger name="RocketmqRemoting" level="warn" additivity="false">
+			<AppenderRef ref="RocketmqClientAppender" />
+		</logger>
+		<!-- log4j提供的用于输出MDC日志的Logger。 EventLogger.logEvent方法的输出内容将使用该日志方案 -->
+		<Logger name="EventLogger" level="DEBUG" additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="logfile" />
+			<appender-ref ref="mongoAppender"/>
+		</Logger>
+		<Logger name="org.springframework" level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="logfile" />
+			<appender-ref ref="mongoAppender"/>
+		</Logger>
+		<!-- 如果希望查看Mybatis扫描了哪些bean，可以放开该日志 -->
+		<Logger name="org.apache.ibatis.io.ResolverUtil" level="ERROR"
+			additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="logfile" />
+			<appender-ref ref="mongoAppender"/>
+		</Logger>
+		<Logger name="cn.jyc.fastpay.dao" level="TRACE" additivity="false">
+			<AppenderRef ref="console" />
+		</Logger>
+		<Logger name="org.apache.commons.beanutils" level="ERROR"
+			additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="logfile" />
+			<appender-ref ref="mongoAppender"/>
+		</Logger>
+	</loggers>
+</configuration>  

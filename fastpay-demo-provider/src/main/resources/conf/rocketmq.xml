@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       		http://www.springframework.org/schema/beans/spring-beans.xsd"
+	default-autowire="byName">
+
+	<!-- 生产者 -->
+	<bean id="rocketMqProducer" class="cn.evun.sweet.core.rocketmq.Producer" init-method="init">
+		<!--name server 多个地址用分号隔开  -->
+		<property name="namesrvAddr" value="${rocketmq.product.namesrvAddr}" />
+		<!-- producer 组名，多个producer如果属于同一个应用，发同样的消息，则应归为一组 -->
+		<property name="producerGroup" value="${rocketmq.product.producerGroup}" />
+		<!-- 通信层异步回调线程数 -->
+		<property name="clientCallbackExecutorThreads" value="${rocketmq.product.clientCallbackExecutorThreads}" />
+		<!--向broker发送心跳间隔时间  单位毫秒-->
+		<property name="heartbeatBrokerInterval" value="${rocketmq.product.heartbeatBrokerInterval}" />
+		<!--持久化COnsumer消费进度间隔 单位毫秒  -->
+		<property name="persistConsumerOffsetInterval" value="${rocketmq.product.persistConsumerOffsetInterval}" />
+		<!-- 轮询name server间隔时间  单位毫秒 -->
+		<property name="pollNameServerInteval" value="${rocketmq.product.pollNameServerInteval}" />
+		<!-- 在发送消息时，自动创建服务器不存在的topic,需要指定key -->
+		<property name="createTopicKey" value="${rocketmq.product.createTopicKey}" />
+		<!-- 在发送消息时，自动创建服务器不存在的topic,默认创建的队列数 -->
+		<property name="defaultTopicQueueNums" value="${rocketmq.product.defaultTopicQueueNums}" />
+		<!-- 发送消息超时时间  单位毫秒 -->
+		<property name="sendMsgTimeout" value="${rocketmq.product.sendMsgTimeout}" />
+		<!-- 消息body超过多大开始压缩（consumer收到消息会自动解压缩，单位字节） -->
+		<property name="compressMsgBodyOverHowmuch" value="${rocketmq.product.compressMsgBodyOverHowmuch}" />
+		<!-- 如果发送消息返回sendResult,但是数呢的Status!=SEND_OK,是否重试发送-->
+		<property name="retryAnotherBrokerWhenNotStoreOK" value="${rocketmq.product.retryAnotherBrokerWhenNotStoreOK}" />
+		<!--客户端限制消息大小，超过报错，同时服务端也会限制 -->
+		<property name="maxMessageSize" value="${rocketmq.product.maxMessageSize}" />
+		<!--事务模式  -->
+		<property name="isTransaction" value="${rocketmq.product.isTransaction}" />
+	</bean>
+	
+	<!-- 消费者监听配置 -->
+	<!-- push 模式配置 -->
+	<bean id="rocketMqPushConsumer" class="cn.evun.sweet.core.rocketmq.PushConsumer" init-method="init" destroy-method="destory">
+		<!--nameserver 多个分号隔开 -->
+		<property name="namesrvAddr" value="${rocketmq.consumer.push.namesrvAddr}" />
+		<!-- 组名，同属于一个应用，订阅同样的消息，且消费逻辑一致，归为一组，都可以用这个消费者 -->
+		<property name="consumerGroup" value="${rocketmq.consumer.push.consumerGroup}" />
+		<property name="topic" value="${rocketmq.consumer.push.topic}" />
+		<!--topic下的tags  -->
+		<property name="subExpression" value="${rocketmq.consumer.push.subExpression}" />
+		<!-- 通信层异步回调线程数 -->
+		<property name="clientCallbackExecutorThreads" value="${rocketmq.consumer.push.clientCallbackExecutorThreads}" />
+		<property name="consumeThreadMin" value="${rocketmq.consumer.push.consumeThreadMin}" />
+		<property name="consumeThreadMax" value="${rocketmq.consumer.push.consumeThreadMax}" />
+		<!-- 单队列并行消费允许的最大跨度 -->
+		<property name="consumeConcurrentlyMaxSpan" value="${rocketmq.consumer.push.consumeConcurrentlyMaxSpan}" />
+		<!--拉消息本地缓存最大数  -->
+		<property name="pullThresholdForQueue" value="${rocketmq.consumer.push.pullThresholdForQueue}" />
+		<!-- 拉去消息间隔，因为是长轮询所以是0，为了控流可以大于0，单位毫秒 -->
+		<property name="pullInterval" value="${rocketmq.consumer.push.pullInterval}" />
+		<!-- 批量消费一次消费多少条消息 -->
+		<property name="consumeMessageBatchMaxSize" value="${rocketmq.consumer.push.consumeMessageBatchMaxSize}" />
+		<!-- 批量拉消息一次拉多少条 -->
+		<property name="pullBatchSize" value="${rocketmq.consumer.push.pullBatchSize}" />
+		<property name="concurrentlyMessageListener" ref="pushMessageConcurrentlyListener" />
+		<!-- isOrderly=true时
+		<property name="orderlyMessageListener" ref="orderlyMessageListener" />
+		 -->
+		<property name="isOrderly" value="${rocketmq.consumer.push.isOrderly}"/>
+	</bean>
+	<bean id="pushMessageConcurrentlyListener" class="cn.jyc.fastpay.extend.listener.PushMessageConcurrentlyListener" />
+	<bean id="pushMessageOrderlyListener" class="cn.jyc.fastpay.extend.listener.PushMessageOrderlyListener" />
+	
+	<!-- pull 模式配置 -->
+	<bean id="rocketMqPullConsumer" class="cn.evun.sweet.core.rocketmq.PullConsumer" init-method="init" destroy-method="destory">
+		<!-- nameserver 多个分号隔开 -->
+		<property name="namesrvAddr" value="${rocketmq.consumer.pull.namesrvAddr}" />
+		<!-- 组名，同属于一个应用，订阅同样的消息，且消费逻辑一致，归为一组，都可以用这个消费者 -->
+		<property name="consumerGroup" value="${rocketmq.consumer.pull.consumerGroup}" />
+		<property name="topic" value="${rocketmq.consumer.pull.topic}" />
+		<!-- 通信层异步回调线程数 -->
+		<property name="clientCallbackExecutorThreads" value="${rocketmq.consumer.pull.clientCallbackExecutorThreads}" />
+		<!--  长轮询 Consumer拉消息请求在broker挂起最长时间 ,单位毫秒-->
+		<property name="brokerSuspendMaxTimeMillis" value="${rocketmq.consumer.pull.brokerSuspendMaxTimeMillis}" />
+		<!-- 长轮询 Consumer拉消息请求在broker挂起超过多少时间，客户端认为超时 ，单位毫秒-->
+		<property name="consumerTimeoutMillisWhenSuspend" value="${rocketmq.consumer.pull.consumerTimeoutMillisWhenSuspend}" />
+		<!--非长轮询，拉消息超时时间，单位毫秒  -->
+		<property name="consumerPullTimeoutMillis" value="${rocketmq.consumer.pull.consumerPullTimeoutMillis}" />
+		<property name="messageListener" ref="pullMessageListener" />
+	</bean>
+	<bean id="pullMessageListener" class="cn.jyc.fastpay.extend.listener.PullMessageListener" />
+</beans>

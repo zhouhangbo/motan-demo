@@ -1,0 +1,52 @@
+<eh:config
+    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xmlns:eh='http://www.ehcache.org/v3'
+    xmlns:jsr107='http://www.ehcache.org/v3/jsr107'
+    xsi:schemaLocation="
+        http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.1.xsd
+        http://www.ehcache.org/v3/jsr107 http://www.ehcache.org/schema/ehcache-107-ext-3.1.xsd">
+
+	<!-- 
+	<eh:thread-pools>
+		<eh:thread-pool alias="defaultPool" min-size="10" max-size="50" default="true"/>
+	</eh:thread-pools>
+	
+	<eh:cache alias="cache_session">
+		<eh:key-type serializer="cn.evun.sweet.core.cache.ehcache.ObjectSerializer">java.lang.Object</eh:key-type>
+		<eh:value-type serializer="cn.evun.sweet.core.cache.ehcache.ObjectSerializer">java.lang.Object</eh:value-type>		
+		<eh:expiry>
+	      	<eh:tti unit="seconds">1800</eh:tti>
+		</eh:expiry>
+		<eh:listeners dispatcher-thread-pool="defaultPool">
+			<eh:listener>
+				<eh:class>cn.evun.sweet.core.cache.ehcache.SessionCacheEventListener</eh:class>
+				<eh:event-firing-mode>SYNCHRONOUS</eh:event-firing-mode>
+				<eh:event-ordering-mode>UNORDERED</eh:event-ordering-mode>
+				<eh:events-to-fire-on>REMOVED</eh:events-to-fire-on>
+				<eh:events-to-fire-on>EXPIRED</eh:events-to-fire-on>
+				<eh:events-to-fire-on>EVICTED</eh:events-to-fire-on>
+				<eh:events-to-fire-on>UPDATED</eh:events-to-fire-on>
+			</eh:listener>
+		</eh:listeners>
+		<eh:heap unit="entries">10000</eh:heap>
+	</eh:cache>
+	
+	<eh:cache alias="cache_verifycode">
+		<eh:key-type serializer="cn.evun.sweet.core.cache.ehcache.ObjectSerializer">java.lang.Object</eh:key-type>
+		<eh:value-type serializer="cn.evun.sweet.core.cache.ehcache.ObjectSerializer">java.lang.Object</eh:value-type>		
+		<eh:expiry>
+	      	<eh:tti unit="seconds">120</eh:tti>
+		</eh:expiry>
+		<eh:heap unit="entries">10000</eh:heap>
+	</eh:cache>
+	-->
+	<eh:cache alias="cache_ehcache"> <!-- cache_main -->
+		<eh:key-type serializer="cn.evun.sweet.core.cache.ehcache.ObjectSerializer">java.lang.Object</eh:key-type>
+		<eh:value-type serializer="cn.evun.sweet.core.cache.ehcache.ObjectSerializer">java.lang.Object</eh:value-type>
+		<eh:resources>
+			<eh:heap unit="MB">100</eh:heap>
+			<eh:offheap unit="MB">128</eh:offheap>
+		</eh:resources>
+	</eh:cache>
+	
+</eh:config>
